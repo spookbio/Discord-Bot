@@ -88,7 +88,7 @@ HTML_TEMPLATE = """
 # === Admin Auth Decorator ===
 def admin_required(f):
     def wrapped(*args, **kwargs):
-        if session.get("admin") != True:
+        if session.get("adminnew") != True:
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
     wrapped.__name__ = f.__name__
@@ -101,13 +101,13 @@ def status():
 
 @app.route("/login", methods=["GET", "POST"])
 def admin_login():
-    if session.get("admin") == True:
+    if session.get("adminnew") == True:
         return redirect(url_for("dashboard"))
 
     if request.method == "POST":
         key = request.form.get("key")
         if key == ADMIN_KEY:
-            session["admin"] = True
+            session["adminnew"] = True
             return redirect(url_for("dashboard"))
         else:
             return '''
