@@ -16,7 +16,7 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 # === Flask App Setup ===
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")  # You can still set this via env or leave default
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")  # Change or set in Render environment
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -72,6 +72,10 @@ def admin_required(f):
     return wrapped
 
 # === Flask Routes ===
+@app.route("/status")
+def status():
+    return "OK", 200
+
 @app.route("/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -120,6 +124,7 @@ def send_message():
 # === Flask Runner in Thread ===
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
+    print(f"Starting Flask on port {port}")
     app.run(host="0.0.0.0", port=port)
 
 # === Bot Events ===
