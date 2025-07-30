@@ -5,7 +5,7 @@ from discord.ext import commands
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
 # === Hardcoded Admin Key (change this to your desired password) ===
-ADMIN_KEY = "yourSuperSecretAdminKey123"
+ADMIN_KEY = "lc1220"
 
 # === Discord Bot Setup ===
 intents = discord.Intents.default()
