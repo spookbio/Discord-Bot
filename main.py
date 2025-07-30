@@ -1,10 +1,11 @@
 import os
+import sys
 import threading
 import discord
 from discord.ext import commands
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
-# === Hardcoded Admin Key (change this to your desired password) ===
+# === Hardcoded Admin Key (change this!) ===
 ADMIN_KEY = "lc1220"
 
 # === Discord Bot Setup ===
@@ -16,7 +17,7 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 # === Flask App Setup ===
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")  # Change or set in Render environment
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -136,12 +137,29 @@ async def on_ready():
     else:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
 
-# === Optional Slash Command ===
+# === Slash Commands ===
 @bot.tree.command(name="ping", description="Check if the bot is online")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("Pong!")
 
-# === Run Bot + Web Server ===
+@bot.tree.command(name="stop", description="Stop the bot (owner only)")
+async def stop(interaction: discord.Interaction):
+    if interaction.user.name == "lcjunior1220":
+        await interaction.response.send_message("Shutting down...", ephemeral=True)
+        await bot.close()
+    else:
+        await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+
+@bot.tree.command(name="restart", description="Restart the bot (owner only)")
+async def restart(interaction: discord.Interaction):
+    if interaction.user.name == "lcjunior1220":
+        await interaction.response.send_message("Restarting bot...", ephemeral=True)
+        await bot.close()
+        sys.exit(0)
+    else:
+        await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+
+# === Run Bot + Flask Webserver ===
 if __name__ == "__main__":
     threading.Thread(target=run_flask).start()
     bot.run(os.environ.get("DISCORD_BOT_TOKEN"))
