@@ -33,16 +33,36 @@ HTML_TEMPLATE = """
         input[type=submit] { background: #50fa7b; border: none; padding: 8px 12px; border-radius: 5px; color: #000; cursor: pointer; }
         .server { background: #282a36; padding: 10px; margin-bottom: 15px; border-radius: 10px; }
         .logout { margin-top: 20px; }
+        .presence-button {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #7289da;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .presence-button:hover {
+            background-color: #5b6eae;
+        }
     </style>
 </head>
 <body>
     <h1>🤖 Bot Dashboard</h1>
     <p>Status: <b style="color:lime;">Online</b></p>
     <p>Connected to {{ guilds|length }} {{ 'server' if guilds|length == 1 else 'servers' }}</p>
+    
+    <!-- Presence Button -->
+    <a href="https://dsc.gg/StealAExperience" target="_blank" rel="noopener" class="presence-button">
+        Join Our Server
+    </a>
+    
     {% for g in guilds %}
         <div class="server">
             <h3>{{ g.name }}</h3>
-            <form action="{{ url_for('send_message') }}" method="post">
+            <form action="/send" method="post">
                 <input type="hidden" name="guild_id" value="{{ g.id }}">
                 <label for="channel">Channel:</label>
                 <select name="channel_id">
@@ -59,7 +79,7 @@ HTML_TEMPLATE = """
         </div>
     {% endfor %}
     <div class="logout">
-        <a href="{{ url_for('admin_logout') }}" style="color: #ff5555;">Logout</a>
+        <a href="/logout" style="color: #ff5555;">Logout</a>
     </div>
 </body>
 </html>
@@ -81,19 +101,98 @@ def status():
 
 @app.route("/login", methods=["GET", "POST"])
 def admin_login():
+    if session.get("admin") == True:
+        return redirect(url_for("dashboard"))
+
     if request.method == "POST":
         key = request.form.get("key")
         if key == ADMIN_KEY:
             session["admin"] = True
             return redirect(url_for("dashboard"))
         else:
-            return "<h3>Incorrect key.</h3><a href='/login'>Try again</a>"
+            return '''
+                <h3 style="color: red; font-family: Arial, sans-serif;">Incorrect key.</h3>
+                <a href="/login" style="font-family: Arial, sans-serif; color: #50fa7b;">Try again</a>
+            '''
+
     return '''
-        <h2>Admin Login</h2>
-        <form method="POST">
-            <input type="password" name="key" placeholder="Enter admin key" required>
-            <button type="submit">Login</button>
-        </form>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Admin Login</title>
+        <style>
+            body {
+                background: #121212;
+                color: #eee;
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .login-container {
+                background: #282a36;
+                padding: 40px 50px;
+                border-radius: 12px;
+                box-shadow: 0 0 15px #50fa7b;
+                text-align: center;
+                width: 320px;
+            }
+            h2 {
+                margin-bottom: 25px;
+                color: #50fa7b;
+            }
+            input[type=password] {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 20px;
+                border: none;
+                border-radius: 6px;
+                font-size: 16px;
+                background: #44475a;
+                color: #f8f8f2;
+            }
+            input[type=password]::placeholder {
+                color: #bd93f9;
+            }
+            button {
+                background: #50fa7b;
+                border: none;
+                color: #000;
+                padding: 12px 0;
+                width: 100%;
+                font-size: 16px;
+                font-weight: bold;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+            button:hover {
+                background: #44d366;
+            }
+            a {
+                display: inline-block;
+                margin-top: 15px;
+                color: #50fa7b;
+                text-decoration: none;
+                font-size: 14px;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="login-container">
+            <h2>Admin Login</h2>
+            <form method="POST">
+                <input type="password" name="key" placeholder="Enter admin key" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </body>
+    </html>
     '''
 
 @app.route("/logout")
@@ -101,12 +200,18 @@ def admin_logout():
     session.clear()
     return redirect(url_for("admin_login"))
 
+# Dashboard at root /
 @app.route("/", methods=["GET"])
 @admin_required
 def dashboard():
     if not bot_ready:
         return "<h3>Bot is not ready yet, please try again in a moment.</h3>"
     return render_template_string(HTML_TEMPLATE, guilds=cached_guilds)
+
+# Redirect /activity to /
+@app.route("/activity")
+def activity_redirect():
+    return redirect(url_for("dashboard"))
 
 @app.route("/send", methods=["POST"])
 @admin_required
