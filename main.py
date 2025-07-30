@@ -2,7 +2,10 @@ import os
 import threading
 import discord
 from discord.ext import commands
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template_string, request, redirect, url_for, session
+
+# === Hardcoded Admin Key (change this to your desired password) ===
+ADMIN_KEY = "yourSuperSecretAdminKey123"
 
 # === Discord Bot Setup ===
 intents = discord.Intents.default()
@@ -13,6 +16,7 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 # === Flask App Setup ===
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")  # You can still set this via env or leave default
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -25,6 +29,7 @@ HTML_TEMPLATE = """
         select, input[type=text] { padding: 6px; border-radius: 5px; border: none; margin: 5px 0; }
         input[type=submit] { background: #50fa7b; border: none; padding: 8px 12px; border-radius: 5px; color: #000; cursor: pointer; }
         .server { background: #282a36; padding: 10px; margin-bottom: 15px; border-radius: 10px; }
+        .logout { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -50,15 +55,52 @@ HTML_TEMPLATE = """
             </form>
         </div>
     {% endfor %}
+    <div class="logout">
+        <a href="{{ url_for('admin_logout') }}" style="color: #ff5555;">Logout</a>
+    </div>
 </body>
 </html>
 """
 
+# === Admin Auth Decorator ===
+def admin_required(f):
+    def wrapped(*args, **kwargs):
+        if session.get("admin") != True:
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    wrapped.__name__ = f.__name__
+    return wrapped
+
+# === Flask Routes ===
+@app.route("/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        key = request.form.get("key")
+        if key == ADMIN_KEY:
+            session["admin"] = True
+            return redirect(url_for("dashboard"))
+        else:
+            return "<h3>Incorrect key.</h3><a href='/login'>Try again</a>"
+    return '''
+        <h2>Admin Login</h2>
+        <form method="POST">
+            <input type="password" name="key" placeholder="Enter admin key" required>
+            <button type="submit">Login</button>
+        </form>
+    '''
+
+@app.route("/logout")
+def admin_logout():
+    session.clear()
+    return redirect(url_for("admin_login"))
+
 @app.route("/", methods=["GET"])
+@admin_required
 def dashboard():
     return render_template_string(HTML_TEMPLATE, guilds=bot.guilds)
 
 @app.route("/send", methods=["POST"])
+@admin_required
 def send_message():
     guild_id = int(request.form["guild_id"])
     channel_id = int(request.form["channel_id"])
@@ -75,7 +117,7 @@ def send_message():
 
     return redirect(url_for("dashboard"))
 
-# === Flask in Thread ===
+# === Flask Runner in Thread ===
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
@@ -85,17 +127,16 @@ def run_flask():
 async def on_ready():
     print(f"Logged in as {bot.user}")
     if len(bot.guilds) == 1:
-        name = bot.guilds[0].name
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=name))
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
     else:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
 
-# === Basic Slash Command ===
+# === Optional Slash Command ===
 @bot.tree.command(name="ping", description="Check if the bot is online")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("Pong!")
 
-# === Run Flask + Bot Together ===
+# === Run Bot + Web Server ===
 if __name__ == "__main__":
     threading.Thread(target=run_flask).start()
-    bot.run(os.getenv("DISCORD_BOT_TOKEN"))
+    bot.run(os.environ.get("DISCORD_BOT_TOKEN"))
