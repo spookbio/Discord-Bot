@@ -99,6 +99,10 @@ def admin_required(f):
 def status():
     return "OK", 200
 
+@app.route("/activity")
+def activity():
+    return redirect(url_for("admin_login"))
+
 @app.route("/login", methods=["GET", "POST"])
 def admin_login():
     if session.get("adminnew") == True:
