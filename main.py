@@ -1,6 +1,8 @@
 import os
 import sys
 import threading
+import time
+import asyncio
 import discord
 from discord.ext import commands
 from flask import Flask, render_template_string, request, redirect, url_for, session
@@ -102,7 +104,9 @@ def admin_logout():
 @app.route("/", methods=["GET"])
 @admin_required
 def dashboard():
-    return render_template_string(HTML_TEMPLATE, guilds=bot.guilds)
+    if not bot_ready:
+        return "<h3>Bot is not ready yet, please try again in a moment.</h3>"
+    return render_template_string(HTML_TEMPLATE, guilds=cached_guilds)
 
 @app.route("/send", methods=["POST"])
 @admin_required
@@ -122,20 +126,32 @@ def send_message():
 
     return redirect(url_for("dashboard"))
 
-# === Flask Runner in Thread ===
-def run_flask():
-    port = int(os.environ.get("PORT", 5000))
-    print(f"Starting Flask on port {port}")
-    app.run(host="0.0.0.0", port=port)
+# === Globals for caching and ready state ===
+cached_guilds = []
+bot_ready = False
+
+# === Background task to update cached guilds every 90 seconds ===
+async def update_guild_cache():
+    global cached_guilds
+    while True:
+        cached_guilds = list(bot.guilds)
+        print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
+        await asyncio.sleep(90)
 
 # === Bot Events ===
 @bot.event
 async def on_ready():
+    global bot_ready
+    bot_ready = True
     print(f"Logged in as {bot.user}")
+
     if len(bot.guilds) == 1:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
     else:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+
+    # Start the cache updater task
+    bot.loop.create_task(update_guild_cache())
 
 # === Slash Commands ===
 @bot.tree.command(name="ping", description="Check if the bot is online")
@@ -158,6 +174,12 @@ async def restart(interaction: discord.Interaction):
         sys.exit(0)
     else:
         await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+
+# === Flask Runner in Thread ===
+def run_flask():
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Starting Flask on port {port}")
+    app.run(host="0.0.0.0", port=port)
 
 # === Run Bot + Flask Webserver ===
 if __name__ == "__main__":
