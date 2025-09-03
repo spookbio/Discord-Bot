@@ -16,6 +16,7 @@ intents.guilds = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="/", intents=intents)
+await bot.tree.sync()
 
 # === Flask App Setup ===
 app = Flask(__name__)
@@ -245,7 +246,8 @@ async def update_guild_cache():
     while True:
         cached_guilds = list(bot.guilds)
         print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(90)
+        await asyncio.sleep(60)
+        await bot.tree.sync()
 
 # === Bot Events ===
 @bot.event
@@ -272,6 +274,7 @@ async def stop(interaction: discord.Interaction):
     if interaction.user.name == "lcjunior1220":
         await interaction.response.send_message("Shutting down...", ephemeral=True)
         await bot.close()
+        await bot.tree.sync()
     else:
         await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
 
@@ -280,6 +283,7 @@ async def restart(interaction: discord.Interaction):
     if interaction.user.name == "lcjunior1220":
         await interaction.response.send_message("Restarting bot...", ephemeral=True)
         await bot.close()
+        await bot.tree.sync()
         sys.exit(0)
     else:
         await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
@@ -287,6 +291,7 @@ async def restart(interaction: discord.Interaction):
 # === Flask Runner in Thread ===
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
+    await bot.tree.sync()
     print(f"Starting Flask on port {port}")
     app.run(host="0.0.0.0", port=port)
 
