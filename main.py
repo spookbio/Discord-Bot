@@ -291,7 +291,7 @@ async def restart(interaction: discord.Interaction):
 # === Flask Runner in Thread ===
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
-    await bot.tree.sync()
+    bot.tree.sync()
     print(f"Starting Flask on port {port}")
     app.run(host="0.0.0.0", port=port)
 
