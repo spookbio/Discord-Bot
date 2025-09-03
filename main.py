@@ -16,7 +16,7 @@ intents.guilds = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="/", intents=intents)
-await bot.tree.sync()
+bot.tree.sync()
 
 # === Flask App Setup ===
 app = Flask(__name__)
