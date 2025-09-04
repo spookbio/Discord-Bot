@@ -283,7 +283,7 @@ async def on_ready():
 # === Slash Commands ===
 @bot.tree.command(name="status", description="Get the spook.bio status")
 async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("[Status Page](https://spook.bio/status)")
+    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
 @bot.tree.command(name="stop", description="Stop the bot")
 async def stop(interaction: discord.Interaction):
