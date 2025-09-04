@@ -278,8 +278,8 @@ async def stop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("Only lcjunior1220 can use this command.", ephemeral=True)
 
-@bot.tree.command(name ="GetProfilePicture", description="Get A User's spook.bio Profile Picture")
-async def GetProfilePicture(interaction: discord.Interaction):
+@bot.tree.command(name ="getprofilepicture", description="Get A User's spook.bio Profile Picture")
+async def getprofilepicture(interaction: discord.Interaction):
     url = "https://spook.bio/u/{interaction.message.content}/pfp.jpg"
     response = requests.get(url)
     if response.status_code == 200:
