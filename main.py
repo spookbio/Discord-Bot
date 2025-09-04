@@ -314,7 +314,7 @@ async def discordtospook(interaction: discord.Interaction, user: discord.Member 
         await interaction.response.send_message(f"{user.mention}'s [Profile]({response.text})", ephemeral=False)
         print("Fetched data successfully!")
     else:
-        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile.", ephemeral=False)
+        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
 
 
