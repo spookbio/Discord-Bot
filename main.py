@@ -284,7 +284,7 @@ async def getprofilepicture(interaction: discord.Interaction):
     response = requests.get(url)
     if response.status_code == 200:
         data = response
-        await interaction.reponse.send_message(data, ephemeral=False)
+        await interaction.response.send_message(data, ephemeral=False)
         print("Fetched data:", data)
     else:
         await interaction.reponse.send_message(f":x: Error fetching data: {response.status_code} :x:", ephemeral=False)
