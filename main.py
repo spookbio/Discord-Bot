@@ -307,9 +307,11 @@ async def pfp(interaction: discord.Interaction, username: str = "lecanact"):
 @bot.tree.command(name ="discord2spook", description="Get someone's spook.bio profile from their discord username.")
 async def pfp(interaction: discord.Interaction, user: discord.member):
     url = f"https://prp.bio/discord/{user.name}"
+    print(url)
     response = requests.get(url)
+    print(response.text)
     if response.status_code == 200:
-        await interaction.response.send_message(f"{user.mention}'s spook.bio [Profile]({url})", ephemeral=False)
+        await interaction.response.send_message(f"{user.mention}'s spook.bio [Profile]({response.text})", ephemeral=False)
         print("Fetched data successfully!")
     else:
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
