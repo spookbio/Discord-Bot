@@ -245,8 +245,7 @@ async def update_guild_cache():
     while True:
         cached_guilds = list(bot.guilds)
         print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(60)
-        await bot.tree.sync()
+        await asyncio.sleep(90)
 
 # === Bot Events ===
 @bot.event
@@ -273,7 +272,6 @@ async def stop(interaction: discord.Interaction):
     if interaction.user.name == "lcjunior1220":
         await interaction.response.send_message("Shutting down...", ephemeral=True)
         await bot.close()
-        await bot.tree.sync()
     else:
         await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
 
@@ -282,7 +280,6 @@ async def restart(interaction: discord.Interaction):
     if interaction.user.name == "lcjunior1220":
         await interaction.response.send_message("Restarting bot...", ephemeral=True)
         await bot.close()
-        await bot.tree.sync()
         sys.exit(0)
     else:
         await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
