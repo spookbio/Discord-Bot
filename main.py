@@ -280,7 +280,7 @@ async def stop(interaction: discord.Interaction):
 
 @bot.tree.command(name ="GetProfilePicture", description="Get A User's spook.bio Profile Picture")
 async def GetProfilePicture(interaction: discord.Interaction):
-    url = "https://spook.bio/u/{interaction.message.content}/pfp.jpg
+    url = "https://spook.bio/u/{interaction.message.content}/pfp.jpg"
     response = requests.get(url)
     if response.status_code == 200:
         data = response
