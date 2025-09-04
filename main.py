@@ -281,9 +281,9 @@ async def on_ready():
 
 
 # === Slash Commands ===
-@bot.tree.command(name="ping", description="Check if the bot is online")
+@bot.tree.command(name="status", description="Get the spook.bio status")
 async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("Online!")
+    await interaction.response.send_message("[Status Page](https://spook.bio/status)")
 
 @bot.tree.command(name="stop", description="Stop the bot")
 async def stop(interaction: discord.Interaction):
@@ -293,7 +293,7 @@ async def stop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("Only lcjunior1220 can use this command.", ephemeral=True)
 
-@bot.tree.command(name ="pfp", description="Get a pfp from someone's spook.bio profile.")
+@bot.tree.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
 async def pfp(interaction: discord.Interaction, username: str = "lecanact"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
@@ -304,7 +304,7 @@ async def pfp(interaction: discord.Interaction, username: str = "lecanact"):
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
-@bot.tree.command(name ="discord2spook", description="Get someone's spook.bio profile from their discord username.")
+@bot.tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
 async def discord2spook(interaction: discord.Interaction, user: discord.member):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
