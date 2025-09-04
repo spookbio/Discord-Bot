@@ -20,7 +20,7 @@ owner = "sl.ip"
 co_owner = "lcjunior1220"
 
 bot = commands.Bot(command_prefix="/", intents=intents)
-tree = app_commands.CommandTree(bot)
+# tree = app_commands.CommandTree(bot)
 
 # === Flask App Setup ===
 app = Flask(__name__)
@@ -325,29 +325,17 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         print(f"Error fetching data: {response.status_code}")
 
 # === App Commands ===
-@tree.command(name="status", description="Get the spook.bio status")
-async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
+# @tree.command(name="status", description="Get the spook.bio status")
+# async def ping(interaction: discord.Interaction):
+#    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-@tree.command(name="stop", description="Stops The Bot")
-async def stop(interaction: discord.Interaction):
-    if interaction.user.name == "lcjunior1220":
-        await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
-        await bot.close()
-    else:
-        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
+# @tree.command(name="stop", description="Stops The Bot")
 
-@tree.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
-async def pfp(interaction: discord.Interaction, username: str = "phis"):
-    url = f"https://spook.bio/u/{username}/pfp.jpg"
-    response = requests.get(url)
-    if response.status_code == 200:
-        await interaction.response.send_message(url, ephemeral=False)
-        print("Fetched data successfully!")
-    else:
-        await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
-        print(f"Error fetching data: {response.status_code}")
+# @tree.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
 
+<<<<<<< HEAD
+# @tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
+=======
 @tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
@@ -363,7 +351,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
             return
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
-
+>>>>>>> 72b14677016a125053a5c44f7e5e53217940e568
 
 
 
