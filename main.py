@@ -238,16 +238,18 @@ def send_message():
 
 # === Globals for caching and ready state ===
 cached_guilds = []
+profiles = []
 bot_ready = False
 
-# === Background task to update cached guilds every 90 seconds ===
+# === Background task to update cached guilds every 30 seconds ===
 async def update_guild_cache():
     global cached_guilds
+    global profiles
     while True:
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(90)
+        await asyncio.sleep(30)
 
 # === Bot Events ===
 @bot.event
@@ -285,10 +287,12 @@ async def stop(interaction: discord.Interaction):
 ])
 async def get(interaction: discord.Interaction, choice: str, username: str?):
     if choice == "Profiles":
-        await interaction.response.send_message("Not Finished Yet!, ephemral=True)
+        await interaction.response.send_message("Not Finished Yet!", ephemral=True)
     else
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
+    if not username:
+        await interaction.response.send_message("Please enter a username.", ephemeral=True)
     if response.status_code == 200:
         await interaction.response.send_message(url, ephemeral=False)
         print("Fetched data successfully!")
