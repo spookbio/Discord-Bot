@@ -304,6 +304,18 @@ async def pfp(interaction: discord.Interaction, username: str = "lecanact"):
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
+@bot.tree.command(name ="discord2spook", description="Get someone's spook.bio profile from their discord username.")
+async def pfp(interaction: discord.Interaction, user: discord.member):
+    url = f"https://prp.bio/discord/{user.name}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        await interaction.response.send_message(f"{user.mention}'s spook.bio [Profile]({url}), ephemeral=False)
+        print("Fetched data successfully!")
+    else:
+        await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
+        print(f"Error fetching data: {response.status_code}")
+
+
 
 
 # === Flask Runner in Thread ===
