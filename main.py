@@ -268,7 +268,7 @@ async def on_ready():
     
  @bot.event
     async def on_member_join(member):
-        role_name = "New Member Role"
+        role_name = "Member"
         role = discord.utils.get(member.guild.roles, name=role_name)
         if role:
             try:
@@ -295,7 +295,7 @@ async def stop(interaction: discord.Interaction):
         await interaction.response.send_message("Only lcjunior1220 can use this command.", ephemeral=True)
 
 @bot.tree.command(name ="pfp", description="Get a pfp from someone's spook.bio profile.")
-async def pfp(interaction: discord.Interaction, username: str):
+async def pfp(interaction: discord.Interaction, username: str = "lecanact"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
     if response.status_code == 200:
