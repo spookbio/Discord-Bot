@@ -285,7 +285,7 @@ async def stop(interaction: discord.Interaction):
     app_commands.Choice(name="Profile Picture", value="profilepicture"),
     app_commands.Choice(name="Profiles", value="profiles"),
 ])
-async def get(interaction: discord.Interaction, choice: str, username: str?):
+async def get(interaction: discord.Interaction, choice: str, username: str = "lecanact"):
     if choice == "Profiles":
         await interaction.response.send_message("Not Finished Yet!", ephemral=True)
     else
