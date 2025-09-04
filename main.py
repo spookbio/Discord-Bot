@@ -250,21 +250,6 @@ async def update_guild_cache():
         await asyncio.sleep(90)
 
 # === Bot Events ===
- @bot.event
-    async def on_member_join(member):
-        role_name = "Member"
-        role = discord.utils.get(member.guild.roles, name=role_name)
-        if role:
-            try:
-                await member.add_roles(role)
-                print(f"Assigned role '{role_name}' to {member.display_name}")
-            except discord.Forbidden:
-                print(f"Bot lacks permissions to assign role '{role_name}'.")
-            except Exception as e:
-                print(f"Error assigning role: {e}")
-        else:
-            print(f"Role '{role_name}' not found.")
-            
 @bot.event
 async def on_ready():
     global bot_ready
@@ -279,6 +264,20 @@ async def on_ready():
 
     # Start the cache updater task
     bot.loop.create_task(update_guild_cache())
+
+    async def on_member_join(member):
+        role_name = "Member"
+        role = discord.utils.get(member.guild.roles, name=role_name)
+        if role:
+            try:
+                await member.add_roles(role)
+                print(f"Assigned role '{role_name}' to {member.display_name}")
+            except discord.Forbidden:
+                print(f"Bot lacks permissions to assign role '{role_name}'.")
+            except Exception as e:
+                print(f"Error assigning role: {e}")
+        else:
+            print(f"Role '{role_name}' not found.")
 
 
 # === Slash Commands ===
