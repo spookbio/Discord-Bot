@@ -296,5 +296,5 @@ def run_flask():
 # === Run Bot + Flask Webserver ===
 if __name__ == "__main__":
     threading.Thread(target=run_flask).start()
-    bot.run(MTQwMjk1NTM3NDExNzY1MDQ2Mw.Gw4YoT.4U5OTGo36BJ5ucAH9SLEsLjxLyrUYUnMjHr944)
+    bot.run('MTQwMjk1NTM3NDExNzY1MDQ2Mw.Gw4YoT.4U5OTGo36BJ5ucAH9SLEsLjxLyrUYUnMjHr944')
     # bot.run(os.environ.get("DISCORD_BOT_TOKEN"))
