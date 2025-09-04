@@ -305,7 +305,7 @@ async def pfp(interaction: discord.Interaction, username: str = "lecanact"):
         print(f"Error fetching data: {response.status_code}")
 
 @bot.tree.command(name ="discord2spook", description="Get someone's spook.bio profile from their discord username.")
-async def pfp(interaction: discord.Interaction, user: discord.member):
+async def discord2spook(interaction: discord.Interaction, user: discord.member):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
     response = requests.get(url)
