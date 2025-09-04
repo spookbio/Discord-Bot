@@ -265,6 +265,22 @@ async def on_ready():
     # Start the cache updater task
     bot.loop.create_task(update_guild_cache())
 
+    
+ @bot.event
+    async def on_member_join(member):
+        role_name = "New Member Role"
+        role = discord.utils.get(member.guild.roles, name=role_name)
+        if role:
+            try:
+                await member.add_roles(role)
+                print(f"Assigned role '{role_name}' to {member.display_name}")
+            except discord.Forbidden:
+                print(f"Bot lacks permissions to assign role '{role_name}'.")
+            except Exception as e:
+                print(f"Error assigning role: {e}")
+        else:
+            print(f"Role '{role_name}' not found.")
+
 # === Slash Commands ===
 @bot.tree.command(name="ping", description="Check if the bot is online")
 async def ping(interaction: discord.Interaction):
