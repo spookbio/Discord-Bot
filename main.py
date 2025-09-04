@@ -280,8 +280,9 @@ async def stop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("Only lcjunior1220 can use this command.", ephemeral=True)
 
+@bot.all_commands()
 @bot.tree.command(name ="get", description="Get a value from the spook.bio server.")
-@bot.app_commands.choices(choice=[
+@bot.tree.command.get.choices(choice=[
     app_commands.Choice(name="Profile Picture", value="profilepicture"),
     app_commands.Choice(name="Profiles", value="profiles"),
 ])
