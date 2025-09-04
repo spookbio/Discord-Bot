@@ -283,11 +283,11 @@ async def getprofilepicture(interaction: discord.Interaction, username: str):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
     if response.status_code == 200:
-        data = response
+        data = url
         await interaction.response.send_message(data, ephemeral=False)
-        print("Fetched data:", data)
+        print("Fetched data successfully!")
     else:
-        await interaction.response.send_message(f":x: Error fetching data: {response.status_code} :x:", ephemeral=False)
+        await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
 
