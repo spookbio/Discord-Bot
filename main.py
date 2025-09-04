@@ -244,7 +244,7 @@ bot_ready = False
 async def update_guild_cache():
     global cached_guilds
     while True:
-        bot.tree.sync()
+        await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
         await asyncio.sleep(90)
@@ -254,7 +254,7 @@ async def update_guild_cache():
 async def on_ready():
     global bot_ready
     bot_ready = True
-    bot.tree.sync()
+    await bot.tree.sync()
     print(f"Logged in as {bot.user}")
 
     if len(bot.guilds) == 1:
