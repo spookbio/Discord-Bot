@@ -4,6 +4,7 @@ import threading
 import time
 import asyncio
 import discord
+import requests
 from discord.ext import commands
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
@@ -88,7 +89,7 @@ HTML_TEMPLATE = """
 # === Admin Auth Decorator ===
 def admin_required(f):
     def wrapped(*args, **kwargs):
-        if session.get("adminnew") != True:
+        if session.get("admin") != True:
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
     wrapped.__name__ = f.__name__
@@ -105,13 +106,13 @@ def activity():
 
 @app.route("/login", methods=["GET", "POST"])
 def admin_login():
-    if session.get("adminnew") == True:
+    if session.get("admin") == True:
         return redirect(url_for("dashboard"))
 
     if request.method == "POST":
         key = request.form.get("key")
         if key == ADMIN_KEY:
-            session["adminnew"] = True
+            session["admin"] = True
             return redirect(url_for("dashboard"))
         else:
             return '''
@@ -243,6 +244,7 @@ bot_ready = False
 async def update_guild_cache():
     global cached_guilds
     while True:
+        bot.tree.sync()
         cached_guilds = list(bot.guilds)
         print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
         await asyncio.sleep(90)
@@ -252,6 +254,7 @@ async def update_guild_cache():
 async def on_ready():
     global bot_ready
     bot_ready = True
+    bot.tree.sync()
     print(f"Logged in as {bot.user}")
 
     if len(bot.guilds) == 1:
@@ -265,24 +268,29 @@ async def on_ready():
 # === Slash Commands ===
 @bot.tree.command(name="ping", description="Check if the bot is online")
 async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("Pong!")
+    await interaction.response.send_message("Online!")
 
-@bot.tree.command(name="stop", description="Stop the bot (owner only)")
+@bot.tree.command(name="stop", description="Stop the bot")
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == "lcjunior1220":
         await interaction.response.send_message("Shutting down...", ephemeral=True)
         await bot.close()
     else:
-        await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+        await interaction.response.send_message("Only lcjunior1220 can use this command.", ephemeral=True)
 
-@bot.tree.command(name="restart", description="Restart the bot (owner only)")
-async def restart(interaction: discord.Interaction):
-    if interaction.user.name == "lcjunior1220":
-        await interaction.response.send_message("Restarting bot...", ephemeral=True)
-        await bot.close()
-        sys.exit(0)
+@bot.tree.command(name ="GetProfilePicture", description="Get A User's spook.bio Profile Picture)
+async def GetProfilePicture(interaction: discord.Interaction):
+    url = "https://spook.bio/u/{interaction.message.content}/pfp.jpg
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response
+        await interaction.reponse.send_message(data, ephemeral=False)
+        print("Fetched data:", data)
     else:
-        await interaction.response.send_message("Only the bot owner can use this command.", ephemeral=True)
+        await interaction.reponse.send_message(f":x: Error fetching data: {response.status_code} :x:", ephemeral=False)
+        print(f"Error fetching data: {response.status_code}")
+
+
 
 # === Flask Runner in Thread ===
 def run_flask():
