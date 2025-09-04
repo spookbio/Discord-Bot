@@ -288,7 +288,7 @@ async def ping(interaction: discord.Interaction):
 @bot.tree.command(name="stop", description="Stop the bot")
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == "lcjunior1220":
-        await interaction.response.send_message(":white_Checkmark: Shutdown Successfully!", ephemeral=False)
+        await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
         await bot.close()
     else:
         await interaction.response.send_message("Only lcjunior1220 can use this command.", ephemeral=True)
