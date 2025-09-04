@@ -333,26 +333,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
 
 # @tree.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
 
-<<<<<<< HEAD
 # @tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
-=======
-@tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
-async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
-    url = f"https://prp.bio/discord/{user.name}"
-    print(url)
-    response = requests.get(url)
-    print(response.text)
-    if response.status_code == 200:
-        await interaction.response.send_message(f"{user.mention}'s [Profile]({response.text})", ephemeral=False)
-        print("Fetched data successfully!")
-    else:
-        if interaction.author.mention == user.mention:
-            await interaction.response.send_message(f":x: You don't have a spook.bio profile linked to your account {user.mention}! :x: To link your profile to your account please DM {owner} or {co_owner}")
-            return
-        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
-        print(f"Error fetching data: {response.status_code}")
->>>>>>> 72b14677016a125053a5c44f7e5e53217940e568
-
 
 
 # === Flask Runner in Thread ===
