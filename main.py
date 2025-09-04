@@ -320,9 +320,9 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
     else:
         if interaction.author.mention == user.mention:
             await interaction.response.send_message(f":x: You don't have a spook.bio profile linked to your account {user.mention}! :x: To link your profile to your account please DM {owner} or {co_owner}")
-        else:
-            await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
-            print(f"Error fetching data: {response.status_code}")
+            return
+        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
+        print(f"Error fetching data: {response.status_code}")
 
 # === App Commands ===
 @tree.command(name="status", description="Get the spook.bio status")
@@ -360,9 +360,9 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
     else:
         if interaction.author.mention == user.mention:
             await interaction.response.send_message(f":x: You don't have a spook.bio profile linked to your account {user.mention}! :x: To link your profile to your account please DM {owner} or {co_owner}")
-            else:
-                await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
-                print(f"Error fetching data: {response.status_code}")
+            return
+        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
+        print(f"Error fetching data: {response.status_code}")
 
 
 
