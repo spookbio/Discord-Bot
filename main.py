@@ -288,8 +288,8 @@ async def stop(interaction: discord.Interaction):
 async def get(interaction: discord.Interaction, choice: str, username: str = "lecanact"):
     if choice == "Profiles":
         await interaction.response.send_message("Not Finished Yet!", ephemral=True)
-    else
-    url = f"https://spook.bio/u/{username}/pfp.jpg"
+    else:
+         url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
     if not username:
         await interaction.response.send_message("Please enter a username.", ephemeral=True)
