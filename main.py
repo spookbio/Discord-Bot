@@ -318,7 +318,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message(f"{user.mention}'s [Profile]({response.text})", ephemeral=False)
         print("Fetched data successfully!")
     else:
-        if interaction.author.mention == user.mention:
+        if interaction.user.name == user.name:
             await interaction.response.send_message(f":x: You don't have a spook.bio profile linked to your account {user.mention}! :x: To link your profile to your account please DM {owner} or {co_owner}")
             return
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
