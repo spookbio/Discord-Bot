@@ -2,6 +2,7 @@ import os
 import sys
 import threading
 import time
+import signal
 import asyncio
 import discord
 from discord import app_commands
@@ -22,6 +23,13 @@ co_owner = "lcjunior1220"
 bot = commands.Bot(command_prefix="/", intents=intents)
 # tree = app_commands.CommandTree(bot)
 
+try:
+    with open('TOKEN.txt', 'r') as f:
+        token = f.read()
+except FileNotFoundError:
+    print("Error: The file 'TOKEN' was not found.")
+except Exception as e:
+    print(f"An error occurred: {e}")
 # === Flask App Setup ===
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
@@ -60,7 +68,7 @@ HTML_TEMPLATE = """
     <p>Connected to {{ guilds|length }} {{ 'server' if guilds|length == 1 else 'servers' }}</p>
     
     <!-- Presence Button -->
-    <a href="https://dsc.gg/StealAExperience" target="_blank" rel="noopener" class="presence-button">
+    <a href="https://dsc.gg/spook.bio" target="_blank" rel="noopener" class="presence-button">
         Join Our Server
     </a>
     
@@ -244,14 +252,14 @@ def send_message():
 cached_guilds = []
 bot_ready = False
 
-# === Background task to update cached guilds every 20 seconds ===
+# === Background task to update cached guilds every 30 seconds ===
 async def update_guild_cache():
     global cached_guilds
     while True:
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(20)
+        await asyncio.sleep(30)
 
 # === Bot Events ===
 @bot.event
@@ -284,16 +292,31 @@ async def on_ready():
             print(f"Role '{role_name}' not found.")
 
 
+def restartbot():
+    print("Bot Restarting.")
+    os.execv(sys.executable, ["python main.py =)"])
+    os.kill(os.getpid(), signal.SIGINT)
+
 # === Guild Commands ===
 @bot.tree.command(name="status", description="Get the spook.bio status")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-@bot.tree.command(name="stop", description="Stops The Bot")
+@bot.tree.command(name="stop", description="Stop the bot.")
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
         await bot.close()
+        print("Bot Stopped.")
+        sys.exit("Bot Stopped.")
+    else:
+        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
+
+@bot.tree.command(name="restart", description="Restart the bot.")
+async def restart(interaction: discord.Interaction):
+    if interaction.user.name == {owner} or {co_owner}:
+        await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
+        quit()
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
@@ -345,4 +368,4 @@ def run_flask():
 # === Run Bot + Flask Webserver ===
 if __name__ == "__main__":
     threading.Thread(target=run_flask).start()
-    bot.run(os.environ.get("DISCORD_BOT_TOKEN"))
+    bot.run(token)
