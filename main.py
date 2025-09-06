@@ -68,7 +68,7 @@ HTML_TEMPLATE = """
     <p>Connected to {{ guilds|length }} {{ 'server' if guilds|length == 1 else 'servers' }}</p>
     
     <!-- Presence Button -->
-    <a href="https://dsc.gg/spook.bio" target="_blank" rel="noopener" class="presence-button">
+    <a href="https://dsc.gg/spookbio" target="_blank" rel="noopener" class="presence-button">
         Join Our Server
     </a>
     
@@ -277,24 +277,17 @@ async def on_ready():
     # Start the cache updater task
     bot.loop.create_task(update_guild_cache())
 
-    async def on_member_join(member):
-        role_name = "Member"
-        role = discord.utils.get(member.guild.roles, name=role_name)
-        if role:
-            try:
-                await member.add_roles(role)
-                print(f"Assigned role '{role_name}' to {member.display_name}")
-            except discord.Forbidden:
-                print(f"Bot lacks permissions to assign role '{role_name}'.")
-            except Exception as e:
-                print(f"Error assigning role: {e}")
-        else:
-            print(f"Role '{role_name}' not found.")
+
+@bot.event
+async def on_member_join(member):
+    role = discord.utils.get(1393450859861639189)
+    await bot.add_roles(member, role)
+    print(f"Gave {member.name} The Member Role!")
 
 
 def restartbot():
     print("Bot Restarting.")
-    os.execv(sys.executable, ["python main.py =)"])
+    os.execv(sys.executable, ["python3 main.py =)"])
     os.kill(os.getpid(), signal.SIGINT)
 
 # === Guild Commands ===
@@ -316,7 +309,7 @@ async def stop(interaction: discord.Interaction):
 async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
-        quit()
+        restartbot()
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
