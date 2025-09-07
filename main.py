@@ -261,12 +261,12 @@ async def update_guild_cache():
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         if len(bot.guilds) == 1:
-            await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+            await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
             for server in bot.guilds:
                 print(server.name)
                 print(server)
         else:
-            await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+            await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
             for server in bot.guilds:
                 print(server.name)
                 print(server)
@@ -310,6 +310,7 @@ async def identify(self):
     await self.call_hooks('before_identify', self.shard_id, initial=self._initial_identify)
     await self.send_as_json(payload)
     _log.info('Shard ID %s has sent the IDENTIFY payload.', self.shard_id)
+    return self.shard_id
 
 
 
@@ -323,12 +324,12 @@ async def on_ready():
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
     if len(bot.guilds) == 1:
-        await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
         for server in bot.guilds:
             print(server.name)
             print(server)
     else:
-        await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
         for server in bot.guilds:
             print(server.name)
             print(server)
