@@ -252,7 +252,7 @@ def send_message():
 cached_guilds = []
 bot_ready = False
 
-# === Background task to update cached guilds every 30 seconds ===
+# === Background task to update cached guilds every 10 seconds ===
 async def update_guild_cache():
     global cached_guilds
     while True:
@@ -270,7 +270,7 @@ async def update_guild_cache():
                 print(server)
             
         print(f"[SYSTEM] Synced {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(10)
 
 # === Bot Events ===
 @bot.event
@@ -279,6 +279,7 @@ async def on_ready():
     bot_ready = True
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
+    print(bot)
 
     if len(bot.guilds) == 1:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
@@ -309,6 +310,7 @@ def restartbot():
 
 # === Commands ===
 @bot.tree.command(name="status", description="Get the spook.bio status")
+
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
