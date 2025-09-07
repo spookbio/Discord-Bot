@@ -260,8 +260,9 @@ async def update_guild_cache():
         cached_guilds = list(bot.guilds)
         if len(bot.guilds) == 1:
             await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
-            print(server.name)
-            print(server)
+            for server in bot.guilds:
+                print(server.name)
+                print(server)
         else:
             await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
             for server in bot.guilds:
