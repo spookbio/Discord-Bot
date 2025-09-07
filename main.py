@@ -20,8 +20,8 @@ ADMIN_KEY = "lc1220"
 intents = discord.Intents.default()
 intents.guilds = True
 intents.message_content = True
-owner = "<@481295611417853982>"
-co_owner = "lcjunior1220"
+owner = "sl.ip"
+co_owner = "<@481295611417853982>"
 
 try:
     with open('TOKEN.txt', 'r') as f:
