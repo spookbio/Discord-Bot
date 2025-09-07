@@ -271,26 +271,6 @@ async def update_guild_cache():
         print(f"[SYSTEM] Synced {len(cached_guilds)} guild(s) at {time.strftime('%X')}")
         await asyncio.sleep(10)
 
-# === Bot Events ===
-@bot.event
-async def on_ready():
-    global bot_ready
-    bot_ready = True
-    await bot.tree.sync()
-    await app_commands.sync()
-    await bot.change_presence(status=discord.Status.do_not_disturb)
-    print(f"Logged in as {bot.user}")
-    if len(bot.guilds) == 1:
-        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
-        for server in bot.guilds:
-            print(server.name)
-    else:
-        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
-        for server in bot.guilds:
-            print(server.name)
-    # Start the cache updater task
-    bot.loop.create_task(update_guild_cache())
-
 class MyGateway(DiscordWebSocket):
 
     async def identify(self):
@@ -420,6 +400,26 @@ class MyBot(Bot):
 #bot = commands.Bot(command_prefix="/", intents=intents)
 bot = MyBot(command_prefix="/")
 # tree = app_commands.CommandTree(bot)
+
+# === Bot Events ===
+@bot.event
+async def on_ready():
+    global bot_ready
+    bot_ready = True
+    await bot.tree.sync()
+    await app_commands.sync()
+    await bot.change_presence(status=discord.Status.do_not_disturb)
+    print(f"Logged in as {bot.user}")
+    if len(bot.guilds) == 1:
+        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        for server in bot.guilds:
+            print(server.name)
+    else:
+        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        for server in bot.guilds:
+            print(server.name)
+    # Start the cache updater task
+    bot.loop.create_task(update_guild_cache())
 
 @bot.event
 async def on_member_join(member):
