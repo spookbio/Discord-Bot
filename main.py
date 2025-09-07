@@ -390,7 +390,7 @@ class MyBot(Bot):
 
 #bot = commands.Bot(command_prefix="/", intents=intents)
 bot = MyBot(command_prefix="/", intents=intents)
-tree = app_commands.CommandTree(bot)
+#tree = app_commands.CommandTree(bot)
 
 # === Bot Events ===
 @bot.event
