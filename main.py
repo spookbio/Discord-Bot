@@ -18,14 +18,10 @@ ADMIN_KEY = "lc1220"
 
 # === Discord Bot Setup ===
 intents = discord.Intents.default()
-intents.guilds = True
-intents.message_content = True
+#intents.guilds = True
+#intents.message_content = True
 owner = "<@481295611417853982>"
 co_owner = "lcjunior1220"
-
-#bot = commands.Bot(command_prefix="/", intents=intents)
-bot = MyBot(command_prefix="/")
-# tree = app_commands.CommandTree(bot)
 
 try:
     with open('TOKEN.txt', 'r') as f:
@@ -421,6 +417,9 @@ class MyBot(Bot):
                 # This is apparently what the official Discord client does.
                 ws_params.update(sequence=self.ws.sequence, resume=True, session=self.ws.session_id)
 
+#bot = commands.Bot(command_prefix="/", intents=intents)
+bot = MyBot(command_prefix="/")
+# tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_member_join(member):
