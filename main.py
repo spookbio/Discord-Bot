@@ -398,7 +398,7 @@ class MyBot(Bot):
                 ws_params.update(sequence=self.ws.sequence, resume=True, session=self.ws.session_id)
 
 #bot = commands.Bot(command_prefix="/", intents=intents)
-bot = MyBot(command_prefix="/")
+bot = MyBot(command_prefix="/", intents=intents)
 # tree = app_commands.CommandTree(bot)
 
 # === Bot Events ===
