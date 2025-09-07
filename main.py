@@ -296,7 +296,7 @@ class MyGateway(DiscordWebSocket):
         state = self._connection
         if state._activity is not None or state._status is not None:
             payload['d']['presence'] = {
-                'status': discord.Status.do_not_disturb,
+                'status': state._status,
                 'game': state._activity,
                 'since': 0,
                 'afk': False
