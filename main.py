@@ -493,7 +493,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
 
 # === Guild Commands === #
 @app_commands.command(name="status", description="Get the spook.bio status")
-@app_commands.guiild_install()
+@app_commands.guild_install()
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
