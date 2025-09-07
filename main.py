@@ -373,13 +373,11 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         print(f"Error fetching data: {response.status_code}")
 
 # === Guild Commands === #
-@bot.tree.command(name="status", description="Get the spook.bio status")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@bot.tree.command()
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-@bot.tree.command(name="stop", description="Stop the bot.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@bot.tree.command()
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
@@ -389,8 +387,7 @@ async def stop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-@bot.tree.command(name="restart", description="Restart the bot.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@bot.tree.command()
 async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
@@ -398,8 +395,7 @@ async def restart(interaction: discord.Interaction):
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-@bot.tree.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@bot.tree.command()
 async def pfp(interaction: discord.Interaction, username: str = "phis"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
@@ -410,8 +406,7 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
-@bot.tree.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@bot.tree.command()
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
