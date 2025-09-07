@@ -22,7 +22,6 @@ intents.guilds = True
 intents.message_content = True
 owner = "sl.ip"
 co_owner = "<@481295611417853982>"
-MainURL = "https://spook.bio"
 
 try:
     with open('TOKEN.txt', 'r') as f:
@@ -253,14 +252,23 @@ def send_message():
 cached_guilds = []
 bot_ready = False
 
-# === Background task to update cached guilds every 2 minutes ===
+# === Background task to update cached guilds every 10 seconds ===
 async def update_guild_cache():
     global cached_guilds
     while True:
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
-        print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(120)
+        if len(bot.guilds) == 1:
+            #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+            for server in bot.guilds:
+                print(server.name)
+        else:
+            #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+            for server in bot.guilds:
+                print(server.name)
+            
+        print(f"[SYSTEM] Synced {len(cached_guilds)} guild(s) at {time.strftime('%X')}")
+        await asyncio.sleep(10)
 
 class MyGateway(DiscordWebSocket):
 
@@ -390,7 +398,7 @@ class MyBot(Bot):
 
 #bot = commands.Bot(command_prefix="/", intents=intents)
 bot = MyBot(command_prefix="/", intents=intents)
-tree = app_commands.CommandTree(bot)
+# tree = app_commands.CommandTree(bot)
 
 # === Bot Events ===
 @bot.event
@@ -398,22 +406,27 @@ async def on_ready():
     global bot_ready
     bot_ready = True
     await bot.tree.sync()
+    await bot.change_presence(status=discord.Status.do_not_disturb)
     print(f"Logged in as {bot.user}")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.custom, name=f":link: {MainURL}/discord"))
     if len(bot.guilds) == 1:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        for server in bot.guilds:
+            print(server.name)
     else:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
-
+        #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        for server in bot.guilds:
+            print(server.name)
     # Start the cache updater task
-    MyBot(command_prefix="/", intents=intents)
     bot.loop.create_task(update_guild_cache())
 
 @bot.event
 async def on_member_join(member):
     role = discord.utils.get(member.guild.roles, name='Member')
-    await member.add_roles(role)
-    print(f"Gave {member.name} The Member Role!")
+    if role:
+        await member.add_roles(role)
+        print(f"Gave {member.name} The Member Role!")
+    else:
+        print(f" Member Role Not Found! | {member.name}")
 
 
 def restartbot():
@@ -421,22 +434,27 @@ def restartbot():
     os.execv(sys.executable, ["python3 main.py =)"])
     os.kill(os.getpid(), signal.SIGINT)
 
-# === Guild Commands ===
-@tree.command(name="status", description="Get the spook.bio status")
+# === App Commands === #
+@app_commands.command(name="status", description="Get the spook.bio status")
+@app_commands.user_install()
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-@tree.command(name="stop", description="Stop the bot.")
+@app_commands.command(name="stop", description="Stop the bot.")
+@app_commands.user_install()
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
         await bot.close()
         print("Bot Stopped.")
+        close()
+        os.kill(os.getpid(), signal.SIGINT)
         sys.exit("Bot Stopped.")
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-@tree.command(name="restart", description="Restart the bot.")
+@app_commands.command(name="restart", description="Restart the bot.")
+@app_commands.user_install()
 async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
@@ -444,7 +462,8 @@ async def restart(interaction: discord.Interaction):
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-@tree.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
+@app_commands.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
+@app_commands.user_install()
 async def pfp(interaction: discord.Interaction, username: str = "phis"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
@@ -455,7 +474,8 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
-@tree.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
+@app_commands.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
+@app_commands.user_install()
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
@@ -471,16 +491,62 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
 
-# === App Commands ===
-# @tree.command(name="status", description="Get the spook.bio status")
-# async def ping(interaction: discord.Interaction):
-#    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
+# === Guild Commands === #
+@app_commands.command(name="status", description="Get the spook.bio status")
+@app_commands.guild_install()
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-# @tree.command(name="stop", description="Stops The Bot")
+@app_commands.command(name="stop", description="Stop the bot.")
+@app_commands.guild_install()
+async def stop(interaction: discord.Interaction):
+    if interaction.user.name == {owner} or {co_owner}:
+        await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
+        await bot.close()
+        print("Bot Stopped.")
+        close()
+        os.kill(os.getpid(), signal.SIGINT)
+        sys.exit("Bot Stopped.")
+    else:
+        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-# @tree.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
+@app_commands.command(name="restart", description="Restart the bot.")
+@app_commands.guild_install()
+async def restart(interaction: discord.Interaction):
+    if interaction.user.name == {owner} or {co_owner}:
+        await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
+        restartbot()
+    else:
+        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-# @tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
+@app_commands.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
+@app_commands.guild_install()
+async def pfp(interaction: discord.Interaction, username: str = "phis"):
+    url = f"https://spook.bio/u/{username}/pfp.jpg"
+    response = requests.get(url)
+    if response.status_code == 200:
+        await interaction.response.send_message(url, ephemeral=False)
+        print("Fetched data successfully!")
+    else:
+        await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
+        print(f"Error fetching data: {response.status_code}")
+
+@app_commands.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
+@app_commands.guild_install()
+async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
+    url = f"https://prp.bio/discord/{user.name}"
+    print(url)
+    response = requests.get(url)
+    print(response.text)
+    if response.status_code == 200:
+        await interaction.response.send_message(f"{user.mention}'s [Profile]({response.text})", ephemeral=False)
+        print("Fetched data successfully!")
+    else:
+        if interaction.user.name == user.name:
+            await interaction.response.send_message(f":x: You don't have a spook.bio profile linked to your account {user.mention}! :x: To link your profile to your account please DM {owner} or {co_owner}")
+            return
+        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
+        print(f"Error fetching data: {response.status_code}")
 
 
 # === Flask Runner in Thread ===
