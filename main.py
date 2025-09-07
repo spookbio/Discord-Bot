@@ -8,6 +8,8 @@ import discord
 from discord import app_commands
 import requests
 from discord.ext import commands
+from discord.gateway import DiscordWebSocket, _log
+from discord.ext.commands import Bot
 from flask import Flask, render_template_string, request, redirect, url_for, session
 
 # === Hardcoded Admin Key (change this!) ===
