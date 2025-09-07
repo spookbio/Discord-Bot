@@ -373,7 +373,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         print(f"Error fetching data: {response.status_code}")
 
 # === Guild Commands === #
-#async def ping(interaction: discord.Interaction):
+async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
 #async def stop(interaction: discord.Interaction):
