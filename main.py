@@ -373,10 +373,10 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         print(f"Error fetching data: {response.status_code}")
 
 # === Guild Commands === #
-async def ping(interaction: discord.Interaction):
+#async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-async def stop(interaction: discord.Interaction):
+#async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
         await bot.close()
@@ -385,14 +385,14 @@ async def stop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-async def restart(interaction: discord.Interaction):
+#async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
         restartbot()
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-async def pfp(interaction: discord.Interaction, username: str = "phis"):
+#async def pfp(interaction: discord.Interaction, username: str = "phis"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
     if response.status_code == 200:
@@ -402,7 +402,7 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
-async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
+# async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
     response = requests.get(url)
@@ -425,5 +425,5 @@ def run_flask():
 
 # === Run Bot + Flask Webserver ===
 if __name__ == "__main__":
-    threading.Thread(target=run_flask).start()
     bot.run(token)
+    threading.Thread(target=run_flask).start()
