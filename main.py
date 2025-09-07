@@ -259,11 +259,11 @@ async def update_guild_cache():
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         if len(bot.guilds) == 1:
-            await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+            #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
             for server in bot.guilds:
                 print(server.name)
         else:
-            await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+            #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
             for server in bot.guilds:
                 print(server.name)
             
@@ -296,7 +296,7 @@ class MyGateway(DiscordWebSocket):
         state = self._connection
         if state._activity is not None or state._status is not None:
             payload['d']['presence'] = {
-                'status': state._status,
+                'status': discord.Status.do_not_disturb,
                 'game': state._activity,
                 'since': 0,
                 'afk': False
@@ -409,11 +409,11 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.do_not_disturb)
     print(f"Logged in as {bot.user}")
     if len(bot.guilds) == 1:
-        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
         for server in bot.guilds:
             print(server.name)
     else:
-        await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        #await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
         for server in bot.guilds:
             print(server.name)
     # Start the cache updater task
