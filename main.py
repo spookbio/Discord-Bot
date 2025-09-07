@@ -425,5 +425,5 @@ def run_flask():
 
 # === Run Bot + Flask Webserver ===
 if __name__ == "__main__":
-    bot.run(token)
     threading.Thread(target=run_flask).start()
+    bot.run(token)
