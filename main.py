@@ -269,18 +269,58 @@ async def update_guild_cache():
                 print(server.name)
                 print(server)
             
-        print(f"[SYSTEM] Synced {len(cached_guilds)} guilds at {time.strftime('%X')}")
+        print(f"[SYSTEM] Synced {len(cached_guilds)} guild(s) at {time.strftime('%X')}")
         await asyncio.sleep(10)
+
+async def identify(self):
+    payload = {
+        'op': self.IDENTIFY,
+        'd': {
+            'token': token,
+            'properties': {
+                '$os': sys.platform,
+                '$browser': 'Discord Android',
+                '$device': 'Discord Android',
+                '$referrer': '',
+                '$referring_domain': ''
+            },
+            'compress': True,
+            'large_threshold': 250,
+            'v': 3
+        }
+    }
+
+    if self.shard_id is not None and self.shard_count is not None:
+        payload['d']['shard'] = [self.shard_id, self.shard_count]
+
+    state = self._connection
+    if state._activity is not None or state._status is not None:
+        payload['d']['presence'] = {
+            'status': state._status,
+            'game': state._activity,
+            'since': 0,
+            'afk': False
+        }
+
+    if state._intents is not None:
+        payload['d']['intents'] = state._intents.value
+
+    await self.call_hooks('before_identify', self.shard_id, initial=self._initial_identify)
+    await self.send_as_json(payload)
+    _log.info('Shard ID %s has sent the IDENTIFY payload.', self.shard_id)
+
+
+
 
 # === Bot Events ===
 @bot.event
 async def on_ready():
+    DiscordWebSocket.identify = identify
+    await bot.change_presence(status=discord.Status.do_not_disturb)
     global bot_ready
     bot_ready = True
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
-    print(bot)
-
     if len(bot.guilds) == 1:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
         for server in bot.guilds:
@@ -310,11 +350,14 @@ def restartbot():
 
 # === Commands ===
 @bot.tree.command(name="status", description="Get the spook.bio status")
-
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
 @bot.tree.command(name="stop", description="Stop the bot.")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
@@ -325,6 +368,8 @@ async def stop(interaction: discord.Interaction):
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
 @bot.tree.command(name="restart", description="Restart the bot.")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
 async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
@@ -333,6 +378,8 @@ async def restart(interaction: discord.Interaction):
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
 @bot.tree.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
 async def pfp(interaction: discord.Interaction, username: str = "phis"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
@@ -344,6 +391,8 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
         print(f"Error fetching data: {response.status_code}")
 
 @bot.tree.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.user_install()
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
@@ -358,18 +407,6 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
             return
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
-
-# === App Commands ===
-# @tree.command(name="status", description="Get the spook.bio status")
-# async def ping(interaction: discord.Interaction):
-#    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
-
-# @tree.command(name="stop", description="Stops The Bot")
-
-# @tree.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
-
-# @tree.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
-
 
 # === Flask Runner in Thread ===
 def run_flask():
