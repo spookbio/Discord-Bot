@@ -436,13 +436,11 @@ def restartbot():
 
 # === App Commands === #
 @app_commands.command(name="status", description="Get the spook.bio status")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
 @app_commands.command(name="stop", description="Stop the bot.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
@@ -456,7 +454,6 @@ async def stop(interaction: discord.Interaction):
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
 @app_commands.command(name="restart", description="Restart the bot.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
@@ -466,7 +463,6 @@ async def restart(interaction: discord.Interaction):
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
 @app_commands.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def pfp(interaction: discord.Interaction, username: str = "phis"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
@@ -479,7 +475,6 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
         print(f"Error fetching data: {response.status_code}")
 
 @app_commands.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
-@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.user_install()
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
@@ -497,6 +492,61 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         print(f"Error fetching data: {response.status_code}")
 
 # === Guild Commands === #
+@app_commands.command(name="status", description="Get the spook.bio status")
+@app_commands.guiild_install()
+async def ping(interaction: discord.Interaction):
+    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
+
+@app_commands.command(name="stop", description="Stop the bot.")
+@app_commands.guild_install()
+async def stop(interaction: discord.Interaction):
+    if interaction.user.name == {owner} or {co_owner}:
+        await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
+        await bot.close()
+        print("Bot Stopped.")
+        close()
+        os.kill(os.getpid(), signal.SIGINT)
+        sys.exit("Bot Stopped.")
+    else:
+        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
+
+@app_commands.command(name="restart", description="Restart the bot.")
+@app_commands.guild_install()
+async def restart(interaction: discord.Interaction):
+    if interaction.user.name == {owner} or {co_owner}:
+        await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
+        restartbot()
+    else:
+        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
+
+@app_commands.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
+@app_commands.guild_install()
+async def pfp(interaction: discord.Interaction, username: str = "phis"):
+    url = f"https://spook.bio/u/{username}/pfp.jpg"
+    response = requests.get(url)
+    if response.status_code == 200:
+        await interaction.response.send_message(url, ephemeral=False)
+        print("Fetched data successfully!")
+    else:
+        await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
+        print(f"Error fetching data: {response.status_code}")
+
+@app_commands.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
+@app_commands.guild_install()
+async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
+    url = f"https://prp.bio/discord/{user.name}"
+    print(url)
+    response = requests.get(url)
+    print(response.text)
+    if response.status_code == 200:
+        await interaction.response.send_message(f"{user.mention}'s [Profile]({response.text})", ephemeral=False)
+        print("Fetched data successfully!")
+    else:
+        if interaction.user.name == user.name:
+            await interaction.response.send_message(f":x: You don't have a spook.bio profile linked to your account {user.mention}! :x: To link your profile to your account please DM {owner} or {co_owner}")
+            return
+        await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
+        print(f"Error fetching data: {response.status_code}")
 
 
 # === Flask Runner in Thread ===
