@@ -257,7 +257,6 @@ async def update_guild_cache():
     global cached_guilds
     while True:
         await bot.tree.sync()
-        app_commands.sync()
         cached_guilds = list(bot.guilds)
         if len(bot.guilds) == 1:
             await bot.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
@@ -407,7 +406,6 @@ async def on_ready():
     global bot_ready
     bot_ready = True
     await bot.tree.sync()
-    await app_commands.sync()
     await bot.change_presence(status=discord.Status.do_not_disturb)
     print(f"Logged in as {bot.user}")
     if len(bot.guilds) == 1:
