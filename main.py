@@ -261,12 +261,12 @@ async def update_guild_cache():
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         if len(bot.guilds) == 1:
-            await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+            await bot.change_presence(status=discord.Status.invisible, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
             for server in bot.guilds:
                 print(server.name)
                 print(server)
         else:
-            await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+            await bot.change_presence(status=discord.Status.invisible, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
             for server in bot.guilds:
                 print(server.name)
                 print(server)
@@ -274,62 +274,20 @@ async def update_guild_cache():
         print(f"[SYSTEM] Synced {len(cached_guilds)} guild(s) at {time.strftime('%X')}")
         await asyncio.sleep(10)
 
-async def identify(self):
-    payload = {
-        'op': self.IDENTIFY,
-        'd': {
-            'token': token,
-            'properties': {
-                '$os': sys.platform,
-                '$browser': 'Discord Android',
-                '$device': 'Discord Android',
-                '$referrer': '',
-                '$referring_domain': ''
-            },
-            'compress': True,
-            'large_threshold': 250,
-            'v': 3
-        }
-    }
-
-    if self.shard_id is not None and self.shard_count is not None:
-        payload['d']['shard'] = [self.shard_id, self.shard_count]
-
-    state = self._connection
-    if state._activity is not None or state._status is not None:
-        payload['d']['presence'] = {
-            'status': state._status,
-            'game': state._activity,
-            'since': 0,
-            'afk': False
-        }
-
-    if state._intents is not None:
-        payload['d']['intents'] = state._intents.value
-
-    await self.call_hooks('before_identify', self.shard_id, initial=self._initial_identify)
-    await self.send_as_json(payload)
-    _log.info('Shard ID %s has sent the IDENTIFY payload.', self.shard_id)
-    return self.shard_id
-
-
-
-
 # === Bot Events ===
 @bot.event
 async def on_ready():
-    DiscordWebSocket.identify = identify
     global bot_ready
     bot_ready = True
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
     if len(bot.guilds) == 1:
-        await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        await bot.change_presence(status=discord.Status.invisible, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
         for server in bot.guilds:
             print(server.name)
             print(server)
     else:
-        await bot.change_presence(status=identify(), activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        await bot.change_presence(status=discord.Status.invisible, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
         for server in bot.guilds:
             print(server.name)
             print(server)
