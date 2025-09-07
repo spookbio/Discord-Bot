@@ -261,12 +261,12 @@ async def update_guild_cache():
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
         if len(bot.guilds) == 1:
-            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+            await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
             for server in bot.guilds:
                 print(server.name)
                 print(server)
         else:
-            await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+            await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
             for server in bot.guilds:
                 print(server.name)
                 print(server)
@@ -318,18 +318,17 @@ async def identify(self):
 @bot.event
 async def on_ready():
     DiscordWebSocket.identify = identify
-    await bot.change_presence(status=discord.Status.do_not_disturb)
     global bot_ready
     bot_ready = True
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
     if len(bot.guilds) == 1:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
         for server in bot.guilds:
             print(server.name)
             print(server)
     else:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        await bot.change_presence(status=identify, activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
         for server in bot.guilds:
             print(server.name)
             print(server)
