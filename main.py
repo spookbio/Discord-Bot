@@ -262,14 +262,14 @@ async def update_guild_cache():
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
         print(server.name)
         print(server)
-    else:
+        else:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
         for server in bot.guilds:
             print(server.name)
             print(server)
             
         print(f"[SYSTEM] Synced {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(30)
+        await asyncio.sleep(1)
 
 # === Bot Events ===
 @bot.event
