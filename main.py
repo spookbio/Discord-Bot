@@ -258,7 +258,17 @@ async def update_guild_cache():
     while True:
         await bot.tree.sync()
         cached_guilds = list(bot.guilds)
-        print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
+        if len(bot.guilds) == 1:
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        print(server.name)
+        print(server)
+    else:
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        for server in bot.guilds:
+            print(server.name)
+            print(server)
+            
+        print(f"[SYSTEM] Synced {len(cached_guilds)} guilds at {time.strftime('%X')}")
         await asyncio.sleep(30)
 
 # === Bot Events ===
@@ -271,8 +281,13 @@ async def on_ready():
 
     if len(bot.guilds) == 1:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+        print(server.name)
+        print(server)
     else:
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+        for server in bot.guilds:
+            print(server.name)
+            print(server)
 
     # Start the cache updater task
     bot.loop.create_task(update_guild_cache())
@@ -290,7 +305,7 @@ def restartbot():
     os.execv(sys.executable, ["python3 main.py =)"])
     os.kill(os.getpid(), signal.SIGINT)
 
-# === Guild Commands ===
+# === Commands ===
 @bot.tree.command(name="status", description="Get the spook.bio status")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
