@@ -519,13 +519,15 @@ async def discord2spook(interaction: discord.Interaction, user: str = LCJUNIOR12
                 data = response.json()
                 if data and data.get("data") and len(data["data"]) > 0:
                     HeadShot = data["data"][0].get("imageUrl")
+                    embed.set_thumbnail(url=HeadShot)
+                    embed.set_footer(text=MainURL)
+                    await interaction.send(embed=embed)
                 else:
-                    except requests.exceptions.RequestException as e:
-                    print(f"Error fetching avatar headshot: {e}")
-                    await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
-                embed.set_thumbnail(url=HeadShot)
-                embed.set_footer(text=MainURL)
-                await ctx.send(embed=embed)
+                    rint(f"Error fetching avatar headshot: {e}")
+                await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching avatar headshot: {e}")
+                await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
         else:
             print(f"User '{username}' not found.")
             await interaction.response.send_message(f'"{username}" not found.')
