@@ -503,6 +503,9 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
                 Username = Display
             else:
                 Username =f"{Display} (@{user})"
+
+            if Banned:
+                Username=f":x: (USER IS BANNED) :x: {Display} (@{user})"
             
             url = f"https://users.roblox.com/v1/users/{UserID}"
             try:
@@ -511,6 +514,7 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
                 playerdata = response.json()
                 print(playerdata)
                 Description = playerdata["description"]
+                Banned = playerdata["isBanned"]
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching user data for ID {UserID}: {e}")
                 await interaction.response.send_message("Error retrieving description")
