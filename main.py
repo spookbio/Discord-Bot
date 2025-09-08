@@ -472,8 +472,8 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
 
-@bot.tree.command(name="roblox-info", description="Get a Roblox user's profile information.")
-async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1220"):
+@bot.tree.command(name="robloxinfo", description="Get a Roblox user's profile information.")
+async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220"):
 
     url = f"https://users.roblox.com/v1/usernames/users"
 
@@ -510,7 +510,7 @@ async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1
             embed.add_field(name="Test 1", value=UserID, inline=True)
             embed.add_field(name="Test 2", value=user, inline=False) # Not inline means it appears on a new line
             # Set an author (optional)
-            embed.set_author(name=user, icon_url=f"https://roblox.com/users/{UserID}/profile}")
+            embed.set_author(name=user, icon_url=f"https://roblox.com/users/{UserID}/profile")
             # Set a thumbnail (optional)
             url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=420x420&format=Png&is=false"
             try:
@@ -523,7 +523,7 @@ async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1
                     embed.set_footer(text=MainURL)
                     await interaction.response.send_message(embed=embed)
                 else:
-                    rint(f"Error fetching avatar headshot: {e}")
+                    print(f"Error fetching avatar headshot: {e}")
                 await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching avatar headshot: {e}")
