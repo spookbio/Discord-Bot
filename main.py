@@ -518,6 +518,7 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching user data for ID {UserID}: {e}")
                 await interaction.response.send_message("Error retrieving description")
+                return
 
             # Construct the profile URL from the user ID
             profileurl = f"https://www.roblox.com/users/{UserID}/profile"
@@ -550,12 +551,14 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching avatar headshot: {e}")
                 await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
+                return
         else:
             print(f"{user} not found.")
             await interaction.response.send_message(f"{user} not found.")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during the API request: {e}")
         await interaction.response.send_message(f"An error occurred during the API request: {e}")
+        return
 
 # === App Commands ===
 # @app_commands.command(name="status", description="Get the spook.bio status")
