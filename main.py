@@ -518,7 +518,7 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
                 return
             
             if Banned:
-                Username=f":x: (USER IS BANNED) :x: {Display} (@{user})"
+                Username=f"[Account Deleted] {Display} (@{user})"
 
             # Construct the profile URL from the user ID
             profileurl = f"https://www.roblox.com/users/{UserID}/profile"
@@ -545,9 +545,11 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
                     embed.set_author(name=user, icon_url=HeadShot)
                     print(data)
                     await interaction.response.send_message(embed=embed)
+                    return
                 else:
                     print(f"Error fetching avatar headshot: {e}")
                 await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
+                return
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching avatar headshot: {e}")
                 await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
