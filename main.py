@@ -535,8 +535,8 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
                 print(f"Error fetching avatar headshot: {e}")
                 await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
         else:
-            print(f" '{user}' not found.")
-            await interaction.response.send_message(f" '{user}' not found."")
+            print(f"{user} not found.")
+            await interaction.response.send_message(f"{user} not found."")
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during the API request: {e}")
         await interaction.response.send_message(f"An error occurred during the API request: {e}")
