@@ -502,13 +502,14 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
             if Display == user:
                 Username = Display
             else:
-                Username =f"{Display}(@{user})"
+                Username =f"{Display} (@{user})"
             
             url = f"https://users.roblox.com/v1/users/{UserID}"
             try:
                 response = requests.get(url)
                 response.raise_for_status()
                 playerdata = response.json()
+                print(playerdata)
                 Description = playerdata["description"]
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching user data for ID {UserID}: {e}")
@@ -523,7 +524,7 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
             color=discord.Color.blue() # You can use a hex code like 0x00ff00 for green
             )
             # Add fields to the embed (optional)
-            embed.add_field(name="UserID", value=UserID, inline=False)
+            embed.add_field(name="UserID", value=UserID, inline=True)
             embed.add_field(name="UserName", value=user, inline=False) # Not inline means it appears on a new line
             # Set a thumbnail (optional)
             url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=420x420&format=Png&is=false"
@@ -537,6 +538,7 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
                     embed.set_footer(text=f"Requested By {interaction.user.name} | {MainURL}")
                     # Set an author (optional)
                     embed.set_author(name=user, icon_url=HeadShot)
+                    print(data)
                     await interaction.response.send_message(embed=embed)
                 else:
                     print(f"Error fetching avatar headshot: {e}")
