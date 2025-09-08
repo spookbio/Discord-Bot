@@ -512,7 +512,7 @@ async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1
             # Set an author (optional)
             embed.set_author(name=MainURL, icon_url=f"https://{MainURL}/MainLogo.png")
             # Set a thumbnail (optional)
-            url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=512x512&format=Png&is=false"
+            url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=420x420&format=Png&is=false"
             try:
                 response = requests.get(url)
                 response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
