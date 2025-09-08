@@ -473,7 +473,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         print(f"Error fetching data: {response.status_code}")
 
 @bot.command(name="roblox info", description="Get a Roblox user's profile information.")
-async def discord2spook(interaction: discord.Interaction, user: str = LCJUNIOR1220):
+async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1220"):
 
     url = f"https://users.roblox.com/v1/usernames/users"
 
