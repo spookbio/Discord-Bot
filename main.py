@@ -472,7 +472,7 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
 
-@bot.tree.command(name="roblox info", description="Get a Roblox user's profile information.")
+@bot.tree.command(name="roblox-info", description="Get a Roblox user's profile information.")
 async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1220"):
 
     url = f"https://users.roblox.com/v1/usernames/users"
