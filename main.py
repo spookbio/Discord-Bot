@@ -510,7 +510,7 @@ async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1
             embed.add_field(name="Test 1", value=UserID, inline=True)
             embed.add_field(name="Test 2", value=user, inline=False) # Not inline means it appears on a new line
             # Set an author (optional)
-            embed.set_author(name=MainURL, icon_url=f"https://{MainURL}/MainLogo.png")
+            embed.set_author(name=user, icon_url=f"https://roblox.com/users/{UserID}/profile}")
             # Set a thumbnail (optional)
             url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=420x420&format=Png&is=false"
             try:
@@ -521,7 +521,7 @@ async def discord2spook(interaction: discord.Interaction, user: str = "LCJUNIOR1
                     HeadShot = data["data"][0].get("imageUrl")
                     embed.set_thumbnail(url=HeadShot)
                     embed.set_footer(text=MainURL)
-                    await interaction.send(embed=embed)
+                    await interaction.response.send_message(embed=embed)
                 else:
                     rint(f"Error fetching avatar headshot: {e}")
                 await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
