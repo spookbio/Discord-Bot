@@ -502,15 +502,15 @@ async def discord2spook(interaction: discord.Interaction, user: str = LCJUNIOR12
             profileurl = f"https://www.roblox.com/users/{UserID}/profile"
             # Create the embed object
             embed = discord.Embed(
-            title="My Awesome Embed",
-            description="This is a simple embed created with discord.py.",
+            title=user,
+            description=userinfo,
             color=discord.Color.blue() # You can use a hex code like 0x00ff00 for green
             )
             # Add fields to the embed (optional)
-            embed.add_field(name="Field 1", value="This is the value for Field 1.", inline=True)
-            embed.add_field(name="Field 2", value="This is the value for Field 2.", inline=False) # Not inline means it appears on a new line
+            embed.add_field(name="Test 1", value=UserID, inline=True)
+            embed.add_field(name="Test 2", value=user, inline=False) # Not inline means it appears on a new line
             # Set an author (optional)
-            embed.set_author(name="Bot Creator", icon_url="https://example.com/author_icon.png")
+            embed.set_author(name=MainURL, icon_url=f"https://{MainURL}/MainLogo.png")
             # Set a thumbnail (optional)
             url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=512x512&format=Png&is=false"
             try:
