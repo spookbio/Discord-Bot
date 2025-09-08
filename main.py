@@ -2,6 +2,7 @@ import os
 import sys
 import threading
 import time
+import json
 import signal
 import asyncio
 import discord
@@ -422,11 +423,11 @@ def restartbot():
     os.kill(os.getpid(), signal.SIGINT)
 
 # === Guild Commands ===
-@tree.command(name="status", description="Get the spook.bio status")
+@bot.command(name="status", description="Get the spook.bio status")
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
 
-@tree.command(name="stop", description="Stop the bot.")
+@bot.command(name="stop", description="Stop the bot.")
 async def stop(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
@@ -436,7 +437,7 @@ async def stop(interaction: discord.Interaction):
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-@tree.command(name="restart", description="Restart the bot.")
+@bot.command(name="restart", description="Restart the bot.")
 async def restart(interaction: discord.Interaction):
     if interaction.user.name == {owner} or {co_owner}:
         await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
@@ -444,7 +445,7 @@ async def restart(interaction: discord.Interaction):
     else:
         await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
 
-@tree.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
+@bot.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
 async def pfp(interaction: discord.Interaction, username: str = "phis"):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
@@ -455,7 +456,7 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
         await interaction.response.send_message(f":x: {response.status_code} Not Found :x:", ephemeral=True)
         print(f"Error fetching data: {response.status_code}")
 
-@tree.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
+@bot.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
     url = f"https://prp.bio/discord/{user.name}"
     print(url)
@@ -470,6 +471,67 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
             return
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
+
+@bot.command(name="roblox info", description="Get a Roblox user's profile information.")
+async def discord2spook(interaction: discord.Interaction, user: str = LCJUNIOR1220):
+
+    url = f"https://users.roblox.com/v1/usernames/users"
+
+    print(f"Fetching Data From {url}")
+    print(f"Searching For {user}")
+
+    request_payload = {
+        "usernames": [user],
+        "excludeBannedUsers": False
+    }
+
+    try:
+        # Send a POST request to the Roblox API
+        response = requests.post(url, json=request_payload)
+        response.raise_for_status() # Raise an exception for bad status codes
+        
+        # Parse the JSON response
+        data = response.json()
+        
+        # Check if the Roblox API returned a user
+        if data.get("data") and len(data["data"]) > 0:
+            userinfo = data["data"][0]
+            UserID = userinfo["id"]
+            
+            # Construct the profile URL from the user ID
+            profileurl = f"https://www.roblox.com/users/{UserID}/profile"
+            # Create the embed object
+            embed = discord.Embed(
+            title="My Awesome Embed",
+            description="This is a simple embed created with discord.py.",
+            color=discord.Color.blue() # You can use a hex code like 0x00ff00 for green
+            )
+            # Add fields to the embed (optional)
+            embed.add_field(name="Field 1", value="This is the value for Field 1.", inline=True)
+            embed.add_field(name="Field 2", value="This is the value for Field 2.", inline=False) # Not inline means it appears on a new line
+            # Set an author (optional)
+            embed.set_author(name="Bot Creator", icon_url="https://example.com/author_icon.png")
+            # Set a thumbnail (optional)
+            url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=512x512&format=Png&is=false"
+            try:
+                response = requests.get(url)
+                response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+                data = response.json()
+                if data and data.get("data") and len(data["data"]) > 0:
+                    HeadShot = data["data"][0].get("imageUrl")
+                else:
+                    except requests.exceptions.RequestException as e:
+                    print(f"Error fetching avatar headshot: {e}")
+                    await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
+                embed.set_thumbnail(url=HeadShot)
+                embed.set_footer(text=MainURL)
+                await ctx.send(embed=embed)
+        else:
+            print(f"User '{username}' not found.")
+            await interaction.response.send_message(f'"{username}" not found.')
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred during the API request: {e}")
+        await interaction.response.send_message(f"An error occurred during the API request: {e}")
 
 # === App Commands ===
 # @tree.command(name="status", description="Get the spook.bio status")
