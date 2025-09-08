@@ -504,12 +504,22 @@ async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220
             else:
                 Username =f"{Display}(@{user})"
             
+            url = f"https://users.roblox.com/v1/users/{UserID}"
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                playerdata = response.json()
+                Description = playerdata["description"]
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching user data for ID {UserID}: {e}")
+                await interaction.response.send_message("Error retrieving description")
+
             # Construct the profile URL from the user ID
             profileurl = f"https://www.roblox.com/users/{UserID}/profile"
             # Create the embed object
             embed = discord.Embed(
             title=Username,
-            description=userinfo["Description"],
+            description=Description,
             color=discord.Color.blue() # You can use a hex code like 0x00ff00 for green
             )
             # Add fields to the embed (optional)
