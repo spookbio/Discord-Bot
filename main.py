@@ -29,19 +29,6 @@ except FileNotFoundError:
 except Exception as e:
     print(f"An error occurred: {e}")
 
-# === Globals for caching and ready state ===
-cached_guilds = []
-bot_ready = False
-
-# === Background task to update cached guilds every 2 minutes ===
-async def update_guild_cache():
-    global cached_guilds
-    while True:
-        await bot.tree.sync()
-        cached_guilds = list(bot.guilds)
-        print(f"[Cache Update] Cached {len(cached_guilds)} guilds at {time.strftime('%X')}")
-        await asyncio.sleep(120)
-
 class MyGateway(DiscordWebSocket):
 
     async def identify(self):
@@ -170,24 +157,13 @@ class MyBot(Bot):
 
 #bot = commands.Bot(command_prefix="/", intents=intents)
 bot = MyBot(command_prefix="/", intents=intents)
-#tree = app_commands.CommandTree(bot)
 
 # === Bot Events ===
 @bot.event
 async def on_ready():
-    global bot_ready
-    bot_ready = True
-    await bot.tree.sync()
     print(f"Logged in as {bot.user}")
     await bot.change_presence(activity=discord.CustomActivity(name=f"🔗 spook.bio/discord"))
-    #if len(bot.guilds) == 1:
-        #await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
-    #else:
-       #await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
-
-    # Start the cache updater task
-    MyBot(command_prefix="/", intents=intents)
-    bot.loop.create_task(update_guild_cache())
+    await bot.tree.sync()
 
 @bot.event
 async def on_member_join(member):
@@ -227,14 +203,4 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
 
-
-# === Flask Runner in Thread ===
-def run_flask():
-    port = int(os.environ.get("PORT", 13456))
-    print(f"Starting Flask on port {port}")
-    app.run(host="0.0.0.0", port=port)
-
-# === Run Bot + Flask Webserver ===
-if __name__ == "__main__":
-    threading.Thread(target=run_flask).start()
-    bot.run(token)
+bot.run(token)
