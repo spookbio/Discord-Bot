@@ -12,17 +12,13 @@ import requests
 from discord.ext import commands
 from discord.gateway import DiscordWebSocket, _log
 from discord.ext.commands import Bot
-from flask import Flask, render_template_string, request, redirect, url_for, session
-
-# === Hardcoded Admin Key (change this!) ===
-ADMIN_KEY = "lc1220"
 
 # === Discord Bot Setup ===
 intents = discord.Intents.default()
 intents.guilds = True
 intents.message_content = True
 owner = "sl.ip"
-co_owner = "<@481295611417853982>"
+co_owner = 481295611417853982
 MainURL = "https://spook.bio"
 
 try:
@@ -32,223 +28,6 @@ except FileNotFoundError:
     print("Error: The file 'TOKEN' was not found.")
 except Exception as e:
     print(f"An error occurred: {e}")
-# === Flask App Setup ===
-app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
-
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Bot Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #1e1e2f; color: #fff; padding: 20px; }
-        h1 { color: #50fa7b; }
-        select, input[type=text] { padding: 6px; border-radius: 5px; border: none; margin: 5px 0; }
-        input[type=submit] { background: #50fa7b; border: none; padding: 8px 12px; border-radius: 5px; color: #000; cursor: pointer; }
-        .server { background: #282a36; padding: 10px; margin-bottom: 15px; border-radius: 10px; }
-        .logout { margin-top: 20px; }
-        .presence-button {
-            display: inline-block;
-            margin-top: 10px;
-            background-color: #7289da;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-        .presence-button:hover {
-            background-color: #5b6eae;
-        }
-    </style>
-</head>
-<body>
-    <h1>🤖 Bot Dashboard</h1>
-    <p>Status: <b style="color:lime;">Online</b></p>
-    <p>Connected to {{ guilds|length }} {{ 'server' if guilds|length == 1 else 'servers' }}</p>
-    
-    <!-- Presence Button -->
-    <a href="https://dsc.gg/spookbio" target="_blank" rel="noopener" class="presence-button">
-        Join Our Server
-    </a>
-    
-    {% for g in guilds %}
-        <div class="server">
-            <h3>{{ g.name }}</h3>
-            <form action="/send" method="post">
-                <input type="hidden" name="guild_id" value="{{ g.id }}">
-                <label for="channel">Channel:</label>
-                <select name="channel_id">
-                    {% for c in g.text_channels %}
-                        <option value="{{ c.id }}">{{ c.name }}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <label for="message">Message:</label>
-                <input type="text" name="message" placeholder="Enter your message" required>
-                <br>
-                <input type="submit" value="Send">
-            </form>
-        </div>
-    {% endfor %}
-    <div class="logout">
-        <a href="/logout" style="color: #ff5555;">Logout</a>
-    </div>
-</body>
-</html>
-"""
-
-# === Admin Auth Decorator ===
-def admin_required(f):
-    def wrapped(*args, **kwargs):
-        if session.get("admin") != True:
-            return redirect(url_for("admin_login"))
-        return f(*args, **kwargs)
-    wrapped.__name__ = f.__name__
-    return wrapped
-
-# === Flask Routes ===
-@app.route("/status")
-def status():
-    return "OK", 200
-
-@app.route("/activity")
-def activity():
-    return redirect(url_for("admin_login"))
-
-@app.route("/login", methods=["GET", "POST"])
-def admin_login():
-    if session.get("admin") == True:
-        return redirect(url_for("dashboard"))
-
-    if request.method == "POST":
-        key = request.form.get("key")
-        if key == ADMIN_KEY:
-            session["admin"] = True
-            return redirect(url_for("dashboard"))
-        else:
-            return '''
-                <h3 style="color: red; font-family: Arial, sans-serif;">Incorrect key.</h3>
-                <a href="/login" style="font-family: Arial, sans-serif; color: #50fa7b;">Try again</a>
-            '''
-
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Admin Login</title>
-        <style>
-            body {
-                background: #121212;
-                color: #eee;
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
-            .login-container {
-                background: #282a36;
-                padding: 40px 50px;
-                border-radius: 12px;
-                box-shadow: 0 0 15px #50fa7b;
-                text-align: center;
-                width: 320px;
-            }
-            h2 {
-                margin-bottom: 25px;
-                color: #50fa7b;
-            }
-            input[type=password] {
-                width: 100%;
-                padding: 12px;
-                margin-bottom: 20px;
-                border: none;
-                border-radius: 6px;
-                font-size: 16px;
-                background: #44475a;
-                color: #f8f8f2;
-            }
-            input[type=password]::placeholder {
-                color: #bd93f9;
-            }
-            button {
-                background: #50fa7b;
-                border: none;
-                color: #000;
-                padding: 12px 0;
-                width: 100%;
-                font-size: 16px;
-                font-weight: bold;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: background 0.3s ease;
-            }
-            button:hover {
-                background: #44d366;
-            }
-            a {
-                display: inline-block;
-                margin-top: 15px;
-                color: #50fa7b;
-                text-decoration: none;
-                font-size: 14px;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="login-container">
-            <h2>Admin Login</h2>
-            <form method="POST">
-                <input type="password" name="key" placeholder="Enter admin key" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    </body>
-    </html>
-    '''
-
-@app.route("/logout")
-def admin_logout():
-    session.clear()
-    return redirect(url_for("admin_login"))
-
-# Dashboard at root /
-@app.route("/", methods=["GET"])
-@admin_required
-def dashboard():
-    if not bot_ready:
-        return "<h3>Bot is not ready yet, please try again in a moment.</h3>"
-    return render_template_string(HTML_TEMPLATE, guilds=cached_guilds)
-
-# Redirect /activity to /
-@app.route("/activity")
-def activity_redirect():
-    return redirect(url_for("dashboard"))
-
-@app.route("/send", methods=["POST"])
-@admin_required
-def send_message():
-    guild_id = int(request.form["guild_id"])
-    channel_id = int(request.form["channel_id"])
-    message = request.form["message"]
-
-    guild = discord.utils.get(bot.guilds, id=guild_id)
-    if guild:
-        channel = discord.utils.get(guild.text_channels, id=channel_id)
-        if channel:
-            try:
-                bot.loop.create_task(channel.send(message))
-            except Exception as e:
-                print(f"Failed to send message: {e}")
-
-    return redirect(url_for("dashboard"))
 
 # === Globals for caching and ready state ===
 cached_guilds = []
@@ -400,11 +179,11 @@ async def on_ready():
     bot_ready = True
     await bot.tree.sync()
     print(f"Logged in as {bot.user}")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.custom, name=f":link: {MainURL}/discord"))
-    if len(bot.guilds) == 1:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
-    else:
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
+    await bot.change_presence(activity=discord.CustomActivity(name=f"🔗 spook.bio/discord"))
+    #if len(bot.guilds) == 1:
+        #await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=bot.guilds[0].name))
+    #else:
+       #await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"))
 
     # Start the cache updater task
     MyBot(command_prefix="/", intents=intents)
@@ -416,37 +195,13 @@ async def on_member_join(member):
     await member.add_roles(role)
     print(f"Gave {member.name} The Member Role!")
 
-
-def restartbot():
-    print("Bot Restarting.")
-    os.execv(sys.executable, ["python3 main.py =)"])
-    os.kill(os.getpid(), signal.SIGINT)
-
 # === Commands ===
 @bot.tree.command(name="status", description="Get the spook.bio status")
-async def ping(interaction: discord.Interaction):
-    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
-
-@bot.tree.command(name="stop", description="Stop the bot.")
-async def stop(interaction: discord.Interaction):
-    if interaction.user.name == {owner} or {co_owner}:
-        await interaction.response.send_message(":white_check_mark: Shutdown Successfully!", ephemeral=False)
-        await bot.close()
-        print("Bot Stopped.")
-        sys.exit("Bot Stopped.")
-    else:
-        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
-
-@bot.tree.command(name="restart", description="Restart the bot.")
-async def restart(interaction: discord.Interaction):
-    if interaction.user.name == {owner} or {co_owner}:
-        await interaction.response.send_message(":white_check_mark: Restarted Successfully!!", ephemeral=False)
-        restartbot()
-    else:
-        await interaction.response.send_message(f"Only {owner}, and {co_owner} can use this command.", ephemeral=True)
+async def status(interaction: discord.Interaction):
+    await interaction.response.send_message("[spook.bio Status Page](https://spook.bio/status)")
 
 @bot.tree.command(name="pfp", description="Get a pfp from a user's spook.bio profile.")
-async def pfp(interaction: discord.Interaction, username: str = "phis"):
+async def pfp(interaction: discord.Interaction, username: str):
     url = f"https://spook.bio/u/{username}/pfp.jpg"
     response = requests.get(url)
     if response.status_code == 200:
@@ -458,7 +213,7 @@ async def pfp(interaction: discord.Interaction, username: str = "phis"):
 
 @bot.tree.command(name="discord2spook", description="Get a spook.bio profile from a discord user.")
 async def discord2spook(interaction: discord.Interaction, user: discord.Member): # = <@481295611417853982>):
-    url = f"https://prp.bio/discord/{user.name}"
+    url = f"https://api.prp.bio/discord/{user.name}"
     print(url)
     response = requests.get(url)
     print(response.text)
@@ -472,111 +227,10 @@ async def discord2spook(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message(f":x: {user.mention} doesn't have a spook.bio profile linked to their account! :x:", ephemeral=False)
         print(f"Error fetching data: {response.status_code}")
 
-@bot.tree.command(name="robloxinfo", description="Get a Roblox user's profile information.")
-async def robloxinfo(interaction: discord.Interaction, user: str = "LCJUNIOR1220"):
-
-    url = f"https://users.roblox.com/v1/usernames/users"
-
-    print(f"Fetching Data From {url}")
-    print(f"Searching For {user}")
-
-    request_payload = {
-        "usernames": [user],
-        "excludeBannedUsers": False
-    }
-
-    try:
-        # Send a POST request to the Roblox API
-        response = requests.post(url, json=request_payload)
-        response.raise_for_status() # Raise an exception for bad status codes
-        
-        # Parse the JSON response
-        data = response.json()
-        
-        # Check if the Roblox API returned a user
-        if data.get("data") and len(data["data"]) > 0:
-            userinfo = data["data"][0]
-            UserID = userinfo["id"]
-            Display = userinfo["displayName"]
-
-            if Display == user:
-                Username = Display
-            else:
-                Username =f"{Display} (@{user})"
-            
-            url = f"https://users.roblox.com/v1/users/{UserID}"
-            try:
-                response = requests.get(url)
-                response.raise_for_status()
-                playerdata = response.json()
-                print(playerdata)
-                Description = playerdata["description"]
-                Banned = playerdata["isBanned"]
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching user data for ID {UserID}: {e}")
-                await interaction.response.send_message("Error retrieving description")
-                return
-            
-            if Banned:
-                Username=f"[Account Deleted] {Display} (@{user})"
-
-            # Construct the profile URL from the user ID
-            profileurl = f"https://www.roblox.com/users/{UserID}/profile"
-            # Create the embed object
-            embed = discord.Embed(
-            title=Username,
-            description=Description,
-            color=discord.Color.blue() # You can use a hex code like 0x00ff00 for green
-            )
-            # Add fields to the embed (optional)
-            embed.add_field(name="UserID", value=UserID, inline=True)
-            embed.add_field(name="UserName", value=user, inline=False) # Not inline means it appears on a new line
-            # Set a thumbnail (optional)
-            url = f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={UserID}&size=420x420&format=Png&is=false"
-            try:
-                response = requests.get(url)
-                response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
-                data = response.json()
-                if data and data.get("data") and len(data["data"]) > 0:
-                    HeadShot = data["data"][0].get("imageUrl")
-                    embed.set_thumbnail(url=HeadShot)
-                    embed.set_footer(text=f"Requested By {interaction.user.name} | {MainURL}")
-                    # Set an author (optional)
-                    embed.set_author(name=user, icon_url=HeadShot)
-                    print(data)
-                    await interaction.response.send_message(embed=embed)
-                    return
-                else:
-                    print(f"Error fetching avatar headshot: {e}")
-                await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
-                return
-            except requests.exceptions.RequestException as e:
-                print(f"Error fetching avatar headshot: {e}")
-                await interaction.response.send_message(f"Failed To Retrieve {user}'s Headshot!")
-                return
-        else:
-            print(f"{user} not found.")
-            await interaction.response.send_message(f"{user} not found.")
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred during the API request: {e}")
-        await interaction.response.send_message(f"An error occurred during the API request: {e}")
-        return
-
-# === App Commands ===
-# @app_commands.command(name="status", description="Get the spook.bio status")
-# async def ping(interaction: discord.Interaction):
-#    await interaction.response.send_message("[spook.bio Status Page](https://spookbio.statuspage.io)")
-
-# @app_commands.command(name="stop", description="Stops The Bot")
-
-# @app_commands.command(name="pfp", description="Get a pfp from someone's spook.bio profile.")
-
-# @app_commands.command(name="discord2spook", description="Get someone's spook.bio profile from their discord username.")
-
 
 # === Flask Runner in Thread ===
 def run_flask():
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 13456))
     print(f"Starting Flask on port {port}")
     app.run(host="0.0.0.0", port=port)
 
